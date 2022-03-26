@@ -55,7 +55,19 @@ namespace Demo.WindowsForms
          //string rt = ViewAreaPixel.RightTop.ToString();
          //var rts = g.MeasureString(rb, DebugFontSmall);
          //g.DrawString(rt, DebugFontSmall, Brushes.Blue, Width - rts.Width - DebugFontSmall.Height, DebugFontSmall.Height);
-      }     
+      }
+
+		private void InitializeComponent()
+		{
+			this.SuspendLayout();
+			// 
+			// Map
+			// 
+			this.Name = "Map";
+			this.Size = new System.Drawing.Size(959, 552);
+			this.ResumeLayout(false);
+
+		}
 #endif
-   }
+	}
 }

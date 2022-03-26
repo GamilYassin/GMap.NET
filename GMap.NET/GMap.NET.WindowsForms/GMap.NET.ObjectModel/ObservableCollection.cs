@@ -6,536 +6,538 @@ using System.ComponentModel;
 
 namespace GMap.NET.ObjectModel
 {
-   public delegate void NotifyCollectionChangedEventHandler(object sender, NotifyCollectionChangedEventArgs e);
+	public delegate void NotifyCollectionChangedEventHandler(object sender, NotifyCollectionChangedEventArgs e);
 
-   public interface INotifyCollectionChanged
-   {
-      // Events
-      event NotifyCollectionChangedEventHandler CollectionChanged;
-   }
+	public interface INotifyCollectionChanged
+	{
+		// Events
+		event NotifyCollectionChangedEventHandler CollectionChanged;
+	}
 
-   public interface INotifyPropertyChanged
-   {
-      // Events
-      event PropertyChangedEventHandler PropertyChanged;
-   }
+	public interface INotifyPropertyChanged
+	{
+		// Events
+		event PropertyChangedEventHandler PropertyChanged;
+	}
 
-   public enum NotifyCollectionChangedAction
-   {
-      Add,
-      Remove,
-      Replace,
-      Move,
-      Reset
-   }
+	public enum NotifyCollectionChangedAction
+	{
+		Add,
+		Remove,
+		Replace,
+		Move,
+		Reset
+	}
 
-   public class NotifyCollectionChangedEventArgs : EventArgs
-   {
-      // Fields
-      private NotifyCollectionChangedAction _action;
-      private IList _newItems;
-      private int _newStartingIndex;
-      private IList _oldItems;
-      private int _oldStartingIndex;
+	public class NotifyCollectionChangedEventArgs : EventArgs
+	{
+		// Fields
+		private NotifyCollectionChangedAction _action;
 
-      // Methods
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(action != NotifyCollectionChangedAction.Reset)
-         {
-            throw new ArgumentException("WrongActionForCtor", "action");
-         }
-         this.InitializeAdd(action, null, -1);
-      }
+		private IList _newItems;
+		private int _newStartingIndex;
+		private IList _oldItems;
+		private int _oldStartingIndex;
 
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList changedItems)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(((action != NotifyCollectionChangedAction.Add) && (action != NotifyCollectionChangedAction.Remove)) && (action != NotifyCollectionChangedAction.Reset))
-         {
-            throw new ArgumentException("MustBeResetAddOrRemoveActionForCtor", "action");
-         }
-         if(action == NotifyCollectionChangedAction.Reset)
-         {
-            if(changedItems != null)
-            {
-               throw new ArgumentException("ResetActionRequiresNullItem", "action");
-            }
-            this.InitializeAdd(action, null, -1);
-         }
-         else
-         {
-            if(changedItems == null)
-            {
-               throw new ArgumentNullException("changedItems");
-            }
-            this.InitializeAddOrRemove(action, changedItems, -1);
-         }
-      }
+		// Methods
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (action != NotifyCollectionChangedAction.Reset)
+			{
+				throw new ArgumentException("WrongActionForCtor", "action");
+			}
+			this.InitializeAdd(action, null, -1);
+		}
 
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object changedItem)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(((action != NotifyCollectionChangedAction.Add) && (action != NotifyCollectionChangedAction.Remove)) && (action != NotifyCollectionChangedAction.Reset))
-         {
-            throw new ArgumentException("MustBeResetAddOrRemoveActionForCtor", "action");
-         }
-         if(action == NotifyCollectionChangedAction.Reset)
-         {
-            if(changedItem != null)
-            {
-               throw new ArgumentException("ResetActionRequiresNullItem", "action");
-            }
-            this.InitializeAdd(action, null, -1);
-         }
-         else
-         {
-            this.InitializeAddOrRemove(action, new object[] { changedItem }, -1);
-         }
-      }
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList changedItems)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (((action != NotifyCollectionChangedAction.Add) && (action != NotifyCollectionChangedAction.Remove)) && (action != NotifyCollectionChangedAction.Reset))
+			{
+				throw new ArgumentException("MustBeResetAddOrRemoveActionForCtor", "action");
+			}
+			if (action == NotifyCollectionChangedAction.Reset)
+			{
+				if (changedItems != null)
+				{
+					throw new ArgumentException("ResetActionRequiresNullItem", "action");
+				}
+				this.InitializeAdd(action, null, -1);
+			}
+			else
+			{
+				if (changedItems == null)
+				{
+					throw new ArgumentNullException("changedItems");
+				}
+				this.InitializeAddOrRemove(action, changedItems, -1);
+			}
+		}
 
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList newItems, IList oldItems)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(action != NotifyCollectionChangedAction.Replace)
-         {
-            throw new ArgumentException("WrongActionForCtor", "action");
-         }
-         if(newItems == null)
-         {
-            throw new ArgumentNullException("newItems");
-         }
-         if(oldItems == null)
-         {
-            throw new ArgumentNullException("oldItems");
-         }
-         this.InitializeMoveOrReplace(action, newItems, oldItems, -1, -1);
-      }
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object changedItem)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (((action != NotifyCollectionChangedAction.Add) && (action != NotifyCollectionChangedAction.Remove)) && (action != NotifyCollectionChangedAction.Reset))
+			{
+				throw new ArgumentException("MustBeResetAddOrRemoveActionForCtor", "action");
+			}
+			if (action == NotifyCollectionChangedAction.Reset)
+			{
+				if (changedItem != null)
+				{
+					throw new ArgumentException("ResetActionRequiresNullItem", "action");
+				}
+				this.InitializeAdd(action, null, -1);
+			}
+			else
+			{
+				this.InitializeAddOrRemove(action, new object[] { changedItem }, -1);
+			}
+		}
 
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList changedItems, int startingIndex)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(((action != NotifyCollectionChangedAction.Add) && (action != NotifyCollectionChangedAction.Remove)) && (action != NotifyCollectionChangedAction.Reset))
-         {
-            throw new ArgumentException("MustBeResetAddOrRemoveActionForCtor", "action");
-         }
-         if(action == NotifyCollectionChangedAction.Reset)
-         {
-            if(changedItems != null)
-            {
-               throw new ArgumentException("ResetActionRequiresNullItem", "action");
-            }
-            if(startingIndex != -1)
-            {
-               throw new ArgumentException("ResetActionRequiresIndexMinus1", "action");
-            }
-            this.InitializeAdd(action, null, -1);
-         }
-         else
-         {
-            if(changedItems == null)
-            {
-               throw new ArgumentNullException("changedItems");
-            }
-            if(startingIndex < -1)
-            {
-               throw new ArgumentException("IndexCannotBeNegative", "startingIndex");
-            }
-            this.InitializeAddOrRemove(action, changedItems, startingIndex);
-         }
-      }
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList newItems, IList oldItems)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (action != NotifyCollectionChangedAction.Replace)
+			{
+				throw new ArgumentException("WrongActionForCtor", "action");
+			}
+			if (newItems == null)
+			{
+				throw new ArgumentNullException("newItems");
+			}
+			if (oldItems == null)
+			{
+				throw new ArgumentNullException("oldItems");
+			}
+			this.InitializeMoveOrReplace(action, newItems, oldItems, -1, -1);
+		}
 
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object changedItem, int index)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(((action != NotifyCollectionChangedAction.Add) && (action != NotifyCollectionChangedAction.Remove)) && (action != NotifyCollectionChangedAction.Reset))
-         {
-            throw new ArgumentException("MustBeResetAddOrRemoveActionForCtor", "action");
-         }
-         if(action == NotifyCollectionChangedAction.Reset)
-         {
-            if(changedItem != null)
-            {
-               throw new ArgumentException("ResetActionRequiresNullItem", "action");
-            }
-            if(index != -1)
-            {
-               throw new ArgumentException("ResetActionRequiresIndexMinus1", "action");
-            }
-            this.InitializeAdd(action, null, -1);
-         }
-         else
-         {
-            this.InitializeAddOrRemove(action, new object[] { changedItem }, index);
-         }
-      }
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList changedItems, int startingIndex)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (((action != NotifyCollectionChangedAction.Add) && (action != NotifyCollectionChangedAction.Remove)) && (action != NotifyCollectionChangedAction.Reset))
+			{
+				throw new ArgumentException("MustBeResetAddOrRemoveActionForCtor", "action");
+			}
+			if (action == NotifyCollectionChangedAction.Reset)
+			{
+				if (changedItems != null)
+				{
+					throw new ArgumentException("ResetActionRequiresNullItem", "action");
+				}
+				if (startingIndex != -1)
+				{
+					throw new ArgumentException("ResetActionRequiresIndexMinus1", "action");
+				}
+				this.InitializeAdd(action, null, -1);
+			}
+			else
+			{
+				if (changedItems == null)
+				{
+					throw new ArgumentNullException("changedItems");
+				}
+				if (startingIndex < -1)
+				{
+					throw new ArgumentException("IndexCannotBeNegative", "startingIndex");
+				}
+				this.InitializeAddOrRemove(action, changedItems, startingIndex);
+			}
+		}
 
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object newItem, object oldItem)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(action != NotifyCollectionChangedAction.Replace)
-         {
-            throw new ArgumentException("WrongActionForCtor", "action");
-         }
-         this.InitializeMoveOrReplace(action, new object[] { newItem }, new object[] { oldItem }, -1, -1);
-      }
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object changedItem, int index)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (((action != NotifyCollectionChangedAction.Add) && (action != NotifyCollectionChangedAction.Remove)) && (action != NotifyCollectionChangedAction.Reset))
+			{
+				throw new ArgumentException("MustBeResetAddOrRemoveActionForCtor", "action");
+			}
+			if (action == NotifyCollectionChangedAction.Reset)
+			{
+				if (changedItem != null)
+				{
+					throw new ArgumentException("ResetActionRequiresNullItem", "action");
+				}
+				if (index != -1)
+				{
+					throw new ArgumentException("ResetActionRequiresIndexMinus1", "action");
+				}
+				this.InitializeAdd(action, null, -1);
+			}
+			else
+			{
+				this.InitializeAddOrRemove(action, new object[] { changedItem }, index);
+			}
+		}
 
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList newItems, IList oldItems, int startingIndex)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(action != NotifyCollectionChangedAction.Replace)
-         {
-            throw new ArgumentException("WrongActionForCtor", "action");
-         }
-         if(newItems == null)
-         {
-            throw new ArgumentNullException("newItems");
-         }
-         if(oldItems == null)
-         {
-            throw new ArgumentNullException("oldItems");
-         }
-         this.InitializeMoveOrReplace(action, newItems, oldItems, startingIndex, startingIndex);
-      }
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object newItem, object oldItem)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (action != NotifyCollectionChangedAction.Replace)
+			{
+				throw new ArgumentException("WrongActionForCtor", "action");
+			}
+			this.InitializeMoveOrReplace(action, new object[] { newItem }, new object[] { oldItem }, -1, -1);
+		}
 
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList changedItems, int index, int oldIndex)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(action != NotifyCollectionChangedAction.Move)
-         {
-            throw new ArgumentException("WrongActionForCtor", "action");
-         }
-         if(index < 0)
-         {
-            throw new ArgumentException("IndexCannotBeNegative", "index");
-         }
-         this.InitializeMoveOrReplace(action, changedItems, changedItems, index, oldIndex);
-      }
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList newItems, IList oldItems, int startingIndex)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (action != NotifyCollectionChangedAction.Replace)
+			{
+				throw new ArgumentException("WrongActionForCtor", "action");
+			}
+			if (newItems == null)
+			{
+				throw new ArgumentNullException("newItems");
+			}
+			if (oldItems == null)
+			{
+				throw new ArgumentNullException("oldItems");
+			}
+			this.InitializeMoveOrReplace(action, newItems, oldItems, startingIndex, startingIndex);
+		}
 
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object changedItem, int index, int oldIndex)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(action != NotifyCollectionChangedAction.Move)
-         {
-            throw new ArgumentException("WrongActionForCtor", "action");
-         }
-         if(index < 0)
-         {
-            throw new ArgumentException("IndexCannotBeNegative", "index");
-         }
-         object[] newItems = new object[] { changedItem };
-         this.InitializeMoveOrReplace(action, newItems, newItems, index, oldIndex);
-      }
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList changedItems, int index, int oldIndex)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (action != NotifyCollectionChangedAction.Move)
+			{
+				throw new ArgumentException("WrongActionForCtor", "action");
+			}
+			if (index < 0)
+			{
+				throw new ArgumentException("IndexCannotBeNegative", "index");
+			}
+			this.InitializeMoveOrReplace(action, changedItems, changedItems, index, oldIndex);
+		}
 
-      public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object newItem, object oldItem, int index)
-      {
-         this._newStartingIndex = -1;
-         this._oldStartingIndex = -1;
-         if(action != NotifyCollectionChangedAction.Replace)
-         {
-            throw new ArgumentException("WrongActionForCtor", "action");
-         }
-         this.InitializeMoveOrReplace(action, new object[] { newItem }, new object[] { oldItem }, index, index);
-      }
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object changedItem, int index, int oldIndex)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (action != NotifyCollectionChangedAction.Move)
+			{
+				throw new ArgumentException("WrongActionForCtor", "action");
+			}
+			if (index < 0)
+			{
+				throw new ArgumentException("IndexCannotBeNegative", "index");
+			}
+			object[] newItems = new object[] { changedItem };
+			this.InitializeMoveOrReplace(action, newItems, newItems, index, oldIndex);
+		}
 
-      private void InitializeAdd(NotifyCollectionChangedAction action, IList newItems, int newStartingIndex)
-      {
-         this._action = action;
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object newItem, object oldItem, int index)
+		{
+			this._newStartingIndex = -1;
+			this._oldStartingIndex = -1;
+			if (action != NotifyCollectionChangedAction.Replace)
+			{
+				throw new ArgumentException("WrongActionForCtor", "action");
+			}
+			this.InitializeMoveOrReplace(action, new object[] { newItem }, new object[] { oldItem }, index, index);
+		}
+
+		private void InitializeAdd(NotifyCollectionChangedAction action, IList newItems, int newStartingIndex)
+		{
+			this._action = action;
 #if !PocketPC
-				 this._newItems = (newItems == null) ? null : ArrayList.ReadOnly(newItems);
+			this._newItems = (newItems == null) ? null : ArrayList.ReadOnly(newItems);
 #else
          this._newItems = (newItems == null) ? null : newItems;
 #endif
-         this._newStartingIndex = newStartingIndex;
-      }
+			this._newStartingIndex = newStartingIndex;
+		}
 
-      private void InitializeAddOrRemove(NotifyCollectionChangedAction action, IList changedItems, int startingIndex)
-      {
-         if(action == NotifyCollectionChangedAction.Add)
-         {
-            this.InitializeAdd(action, changedItems, startingIndex);
-         }
-         else if(action == NotifyCollectionChangedAction.Remove)
-         {
-            this.InitializeRemove(action, changedItems, startingIndex);
-         }
-         else
-         {
-            throw new ArgumentException(string.Format("InvariantFailure, Unsupported action: {0}", action.ToString()));
-         }
-      }
+		private void InitializeAddOrRemove(NotifyCollectionChangedAction action, IList changedItems, int startingIndex)
+		{
+			if (action == NotifyCollectionChangedAction.Add)
+			{
+				this.InitializeAdd(action, changedItems, startingIndex);
+			}
+			else if (action == NotifyCollectionChangedAction.Remove)
+			{
+				this.InitializeRemove(action, changedItems, startingIndex);
+			}
+			else
+			{
+				throw new ArgumentException(string.Format("InvariantFailure, Unsupported action: {0}", action.ToString()));
+			}
+		}
 
-      private void InitializeMoveOrReplace(NotifyCollectionChangedAction action, IList newItems, IList oldItems, int startingIndex, int oldStartingIndex)
-      {
-         this.InitializeAdd(action, newItems, startingIndex);
-         this.InitializeRemove(action, oldItems, oldStartingIndex);
-      }
+		private void InitializeMoveOrReplace(NotifyCollectionChangedAction action, IList newItems, IList oldItems, int startingIndex, int oldStartingIndex)
+		{
+			this.InitializeAdd(action, newItems, startingIndex);
+			this.InitializeRemove(action, oldItems, oldStartingIndex);
+		}
 
-      private void InitializeRemove(NotifyCollectionChangedAction action, IList oldItems, int oldStartingIndex)
-      {
-         this._action = action;
+		private void InitializeRemove(NotifyCollectionChangedAction action, IList oldItems, int oldStartingIndex)
+		{
+			this._action = action;
 #if !PocketPC
-				 this._oldItems = (oldItems == null) ? null : ArrayList.ReadOnly(oldItems);
+			this._oldItems = (oldItems == null) ? null : ArrayList.ReadOnly(oldItems);
 #else
          this._oldItems = (oldItems == null) ? null : oldItems;
 #endif
-         this._oldStartingIndex = oldStartingIndex;
-      }
+			this._oldStartingIndex = oldStartingIndex;
+		}
 
-      // Properties
-      public NotifyCollectionChangedAction Action
-      {
-         get
-         {
-            return this._action;
-         }
-      }
+		// Properties
+		public NotifyCollectionChangedAction Action
+		{
+			get
+			{
+				return this._action;
+			}
+		}
 
-      public IList NewItems
-      {
-         get
-         {
-            return this._newItems;
-         }
-      }
+		public IList NewItems
+		{
+			get
+			{
+				return this._newItems;
+			}
+		}
 
-      public int NewStartingIndex
-      {
-         get
-         {
-            return this._newStartingIndex;
-         }
-      }
+		public int NewStartingIndex
+		{
+			get
+			{
+				return this._newStartingIndex;
+			}
+		}
 
-      public IList OldItems
-      {
-         get
-         {
-            return this._oldItems;
-         }
-      }
+		public IList OldItems
+		{
+			get
+			{
+				return this._oldItems;
+			}
+		}
 
-      public int OldStartingIndex
-      {
-         get
-         {
-            return this._oldStartingIndex;
-         }
-      }
-   }
+		public int OldStartingIndex
+		{
+			get
+			{
+				return this._oldStartingIndex;
+			}
+		}
+	}
 
-   [Serializable]
-   public class ObservableCollection<T> : Collection<T>, INotifyCollectionChanged, INotifyPropertyChanged
-   {
-      // Fields
-      private SimpleMonitor _monitor;
-      private const string CountString = "Count";
-      private const string IndexerName = "Item[]";
+	[Serializable]
+	public class ObservableCollection<T> : Collection<T>, INotifyCollectionChanged, INotifyPropertyChanged
+	{
+		// Fields
+		private SimpleMonitor _monitor;
 
-      // Events
-      [field: NonSerialized]
-      public virtual event NotifyCollectionChangedEventHandler CollectionChanged;
+		private const string CountString = "Count";
+		private const string IndexerName = "Item[]";
 
-      [field: NonSerialized]
-      protected event PropertyChangedEventHandler PropertyChanged;
+		// Events
+		[field: NonSerialized]
+		public virtual event NotifyCollectionChangedEventHandler CollectionChanged;
 
-      event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
-      {
-         add
-         {
-            PropertyChanged += value;
-         }
-         remove
-         {
-            PropertyChanged -= value;
-         }
-      }
+		[field: NonSerialized]
+		protected event PropertyChangedEventHandler PropertyChanged;
 
-      // Methods
-      public ObservableCollection()
-      {
-         this._monitor = new SimpleMonitor();
-      }
+		event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+		{
+			add
+			{
+				PropertyChanged += value;
+			}
+			remove
+			{
+				PropertyChanged -= value;
+			}
+		}
 
-      public ObservableCollection(IEnumerable<T> collection)
-      {
-         this._monitor = new SimpleMonitor();
-         if(collection == null)
-         {
-            throw new ArgumentNullException("collection");
-         }
-         this.CopyFrom(collection);
-      }
+		// Methods
+		public ObservableCollection()
+		{
+			this._monitor = new SimpleMonitor();
+		}
 
-      public ObservableCollection(List<T> list)
-         : base((list != null) ? new List<T>(list.Count) : list)
-      {
-         this._monitor = new SimpleMonitor();
-         this.CopyFrom(list);
-      }
+		public ObservableCollection(IEnumerable<T> collection)
+		{
+			this._monitor = new SimpleMonitor();
+			if (collection == null)
+			{
+				throw new ArgumentNullException("collection");
+			}
+			this.CopyFrom(collection);
+		}
 
-      protected IDisposable BlockReentrancy()
-      {
-         this._monitor.Enter();
-         return this._monitor;
-      }
+		public ObservableCollection(List<T> list)
+		   : base((list != null) ? new List<T>(list.Count) : list)
+		{
+			this._monitor = new SimpleMonitor();
+			this.CopyFrom(list);
+		}
 
-      protected void CheckReentrancy()
-      {
-         if((this._monitor.Busy && (this.CollectionChanged != null)) && (this.CollectionChanged.GetInvocationList().Length > 1))
-         {
-            throw new InvalidOperationException("ObservableCollectionReentrancyNotAllowed");
-         }
-      }
+		protected IDisposable BlockReentrancy()
+		{
+			this._monitor.Enter();
+			return this._monitor;
+		}
 
-      protected override void ClearItems()
-      {
-         this.CheckReentrancy();
-         base.ClearItems();
-         this.OnPropertyChanged(CountString);
-         this.OnPropertyChanged(IndexerName);
-         this.OnCollectionReset();
-      }
+		protected void CheckReentrancy()
+		{
+			if ((this._monitor.Busy && (this.CollectionChanged != null)) && (this.CollectionChanged.GetInvocationList().Length > 1))
+			{
+				throw new InvalidOperationException("ObservableCollectionReentrancyNotAllowed");
+			}
+		}
 
-      private void CopyFrom(IEnumerable<T> collection)
-      {
-         IList<T> items = base.Items;
-         if((collection != null) && (items != null))
-         {
-            using(IEnumerator<T> enumerator = collection.GetEnumerator())
-            {
-               while(enumerator.MoveNext())
-               {
-                  items.Add(enumerator.Current);
-               }
-            }
-         }
-      }
+		protected override void ClearItems()
+		{
+			this.CheckReentrancy();
+			base.ClearItems();
+			this.OnPropertyChanged(CountString);
+			this.OnPropertyChanged(IndexerName);
+			this.OnCollectionReset();
+		}
 
-      protected override void InsertItem(int index, T item)
-      {
-         this.CheckReentrancy();
-         base.InsertItem(index, item);
-         this.OnPropertyChanged(CountString);
-         this.OnPropertyChanged(IndexerName);
-         this.OnCollectionChanged(NotifyCollectionChangedAction.Add, item, index);
-      }
+		private void CopyFrom(IEnumerable<T> collection)
+		{
+			IList<T> items = base.Items;
+			if ((collection != null) && (items != null))
+			{
+				using (IEnumerator<T> enumerator = collection.GetEnumerator())
+				{
+					while (enumerator.MoveNext())
+					{
+						items.Add(enumerator.Current);
+					}
+				}
+			}
+		}
 
-      public void Move(int oldIndex, int newIndex)
-      {
-         this.MoveItem(oldIndex, newIndex);
-      }
+		protected override void InsertItem(int index, T item)
+		{
+			this.CheckReentrancy();
+			base.InsertItem(index, item);
+			this.OnPropertyChanged(CountString);
+			this.OnPropertyChanged(IndexerName);
+			this.OnCollectionChanged(NotifyCollectionChangedAction.Add, item, index);
+		}
 
-      protected virtual void MoveItem(int oldIndex, int newIndex)
-      {
-         this.CheckReentrancy();
-         T item = base[oldIndex];
-         base.RemoveItem(oldIndex);
-         base.InsertItem(newIndex, item);
-         this.OnPropertyChanged(IndexerName);
-         this.OnCollectionChanged(NotifyCollectionChangedAction.Move, item, newIndex, oldIndex);
-      }
+		public void Move(int oldIndex, int newIndex)
+		{
+			this.MoveItem(oldIndex, newIndex);
+		}
 
-      protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-      {
-         if(this.CollectionChanged != null)
-         {
-            using(this.BlockReentrancy())
-            {
-               this.CollectionChanged(this, e);
-            }
-         }
-      }
+		protected virtual void MoveItem(int oldIndex, int newIndex)
+		{
+			this.CheckReentrancy();
+			T item = base[oldIndex];
+			base.RemoveItem(oldIndex);
+			base.InsertItem(newIndex, item);
+			this.OnPropertyChanged(IndexerName);
+			this.OnCollectionChanged(NotifyCollectionChangedAction.Move, item, newIndex, oldIndex);
+		}
 
-      private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index)
-      {
-         this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, item, index));
-      }
+		protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+		{
+			if (this.CollectionChanged != null)
+			{
+				using (this.BlockReentrancy())
+				{
+					this.CollectionChanged(this, e);
+				}
+			}
+		}
 
-      private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index, int oldIndex)
-      {
-         this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, item, index, oldIndex));
-      }
+		private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index)
+		{
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, item, index));
+		}
 
-      private void OnCollectionChanged(NotifyCollectionChangedAction action, object oldItem, object newItem, int index)
-      {
-         this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem, index));
-      }
+		private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index, int oldIndex)
+		{
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, item, index, oldIndex));
+		}
 
-      private void OnCollectionReset()
-      {
-         this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-      }
+		private void OnCollectionChanged(NotifyCollectionChangedAction action, object oldItem, object newItem, int index)
+		{
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem, index));
+		}
 
-      protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
-      {
-         if(this.PropertyChanged != null)
-         {
-            this.PropertyChanged(this, e);
-         }
-      }
+		private void OnCollectionReset()
+		{
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+		}
 
-      private void OnPropertyChanged(string propertyName)
-      {
-         this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-      }
+		protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+		{
+			if (this.PropertyChanged != null)
+			{
+				this.PropertyChanged(this, e);
+			}
+		}
 
-      protected override void RemoveItem(int index)
-      {
-         this.CheckReentrancy();
-         T item = base[index];
-         base.RemoveItem(index);
-         this.OnPropertyChanged(CountString);
-         this.OnPropertyChanged(IndexerName);
-         this.OnCollectionChanged(NotifyCollectionChangedAction.Remove, item, index);
-      }
+		private void OnPropertyChanged(string propertyName)
+		{
+			this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+		}
 
-      protected override void SetItem(int index, T item)
-      {
-         this.CheckReentrancy();
-         T oldItem = base[index];
-         base.SetItem(index, item);
-         this.OnPropertyChanged(IndexerName);
-         this.OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem, item, index);
-      }
+		protected override void RemoveItem(int index)
+		{
+			this.CheckReentrancy();
+			T item = base[index];
+			base.RemoveItem(index);
+			this.OnPropertyChanged(CountString);
+			this.OnPropertyChanged(IndexerName);
+			this.OnCollectionChanged(NotifyCollectionChangedAction.Remove, item, index);
+		}
 
-      // Nested Types
-      [Serializable]
-      private class SimpleMonitor : IDisposable
-      {
-         // Fields
-         private int _busyCount;
+		protected override void SetItem(int index, T item)
+		{
+			this.CheckReentrancy();
+			T oldItem = base[index];
+			base.SetItem(index, item);
+			this.OnPropertyChanged(IndexerName);
+			this.OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldItem, item, index);
+		}
 
-         // Methods
-         public void Dispose()
-         {
-            this._busyCount--;
-         }
+		// Nested Types
+		[Serializable]
+		private class SimpleMonitor : IDisposable
+		{
+			// Fields
+			private int _busyCount;
 
-         public void Enter()
-         {
-            this._busyCount++;
-         }
+			// Methods
+			public void Dispose()
+			{
+				this._busyCount--;
+			}
 
-         // Properties
-         public bool Busy
-         {
-            get
-            {
-               return (this._busyCount > 0);
-            }
-         }
-      }
-   }
+			public void Enter()
+			{
+				this._busyCount++;
+			}
+
+			// Properties
+			public bool Busy
+			{
+				get
+				{
+					return (this._busyCount > 0);
+				}
+			}
+		}
+	}
 }
